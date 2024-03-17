@@ -1,40 +1,37 @@
-<script>
+<script setup>
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
-export default {
-  data() {
-    return {
-      fact: '',
-      data: [],
-      error: null // New error property to store error messages
-    };
-  },
-  created() {
-    this.fetchProductData(); 
-  },
-  methods: {
-    async fetchCatFact() {
-      try {
-        const response = await axios.get('https://catfact.ninja/fact');
-        this.fact = response.data.fact;
-      } catch (error) {
-        this.error = 'Error fetching cat fact: ' + error.message; // Update error property
-        console.error(this.error);
-      }
-    },
-    async fetchProductData() {
-      try {
-        const response = await axios.get('https://dummyjson.com/products');
-        this.data = response.data.products;
-        //console.log(response.data.products);
-      } catch (error) {
-        this.error = 'Error fetching data: ' + error.message; // Update error property
-        console.error(this.error);
-      }
-    }
+const fact = ref('');
+const data = ref([]);
+const error = ref(null);
+
+const fetchCatFact = async () => {
+  try {
+    const response = await axios.get('https://catfact.ninja/fact');
+    fact.value = response.data.fact;
+  } catch (error) {
+    error.value = 'Error fetching cat fact: ' + error.message;
+    console.error(error.value);
   }
 };
+
+const fetchProductData = async () => {
+  try {
+    const response = await axios.get('https://dummyjson.com/products');
+    data.value = response.data.products;
+    //console.log(data)
+  } catch (error) {
+    error.value = 'Error fetching data: ' + error.message;
+    console.error(error.value);
+  }
+};
+
+onMounted(() => {
+  fetchProductData();
+});
 </script>
+
 <template>
     <div>
       <h1>Random Cat Fact</h1>
@@ -54,7 +51,7 @@ export default {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in data.slice(0,5)" :key="index">
+          <tr v-for="(item, index) in data.slice(0,5)" :key="item.id">
             <th scope="row">{{ index + 1 }}</th>
             <td>{{ item.title }}</td>
             <td>{{ item.description }}</td>
